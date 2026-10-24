@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#176b55">
+<title>Meine Arbeitszeit</title>
+<style>
+:root {
+  --green: #176b55;
+  --bg: #f2f5f4;
+  --card: #ffffff;
+  --text: #18312a;
+  --muted: #65766f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, Arial, sans-serif;
+}
+header {
+  background: var(--green);
+  color: white;
+  padding: 22px 18px;
+  border-radius: 0 0 22px 22px;
+}
+header h1 { margin: 0 0 5px; font-size: 25px; }
+header p { margin: 0; opacity: .85; }
+main { max-width: 720px; margin: auto; padding: 14px; }
+.card {
+  background: var(--card);
+  padding: 17px;
+  border-radius: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 9px #1231;
+}
+h2 { margin: 0 0 14px; font-size: 19px; }
+label {
+  display: block;
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+input, button, textarea {
+  font: inherit;
+}
+input, textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid #cbd6d1;
+  border-radius: 9px;
+  background: white;
+  color: var(--text);
+}
+textarea { resize: vertical; }
+.field { margin-bottom: 12px; }
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  min-height: 45px;
+  cursor: pointer;
+  font-weight: 650;
+}
+.primary { background: var(--green); color: white; }
+.secondary { background: #e3eee9; color: var(--green); }
+.danger { background: #fbe8e5; color: #922f25; }
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.stat {
+  background: #e8f1ed;
+  border-radius: 12px;
+  padding: 13px;
+}
+.stat span { display: block; color: var(--muted); font-size: 13px; }
+.stat strong { font-size: 23px; }
+.day {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid #e6ece9;
+  padding: 11px 0;
+}
+.day:last-child { border-bottom: 0; }
+.day small { display: block; color: var(--muted); margin-top: 3px; }
+.day button { min-height: 36px; padding: 7px 10px; }
+.weekend { color: #65766f; }
+.note { font-size: 12px; color: var(--muted); line-height: 1.5; }
+@media (max-width: 360px) {
+  .grid, .buttons { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Meine Arbeitszeit</h1>
+  <p>Persönlicher Arbeitszeitnachweis</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Heute erfassen</h2>
+    <div class="field">
+      <label for="workDate">Arbeitstag</label>
+      <input id="workDate" type="date">
+    </div>
+    <div class="grid">
+      <div class="field">
+        <label for="start">Beginn</label>
+        <input id="start" type="time" value="08:00">
+      </div>
+      <div class="field">
+        <label for="end">Ende</label>
+        <input id="end" type="time" value="16:30">
+      </div>
+      <div class="field">
+        <label for="pause">Pause in Minuten</label>
+        <input id="pause" type="number" min="0" value="30">
+      </div>
+      <div class="field">
+        <label for="target">Sollstunden pro Tag</label>
+        <input id="target" type="number" min="0" step="0.25" value="8">
+      </div>
+    </div>
+    <div class="field">
+      <label for="remarks">Bemerkungen</label>
+      <textarea id="remarks" rows="2" placeholder="Optional"></textarea>
+    </div>
+    <div class="grid">
+      <div class="field">
+        <label><input id="night" type="checkbox" style="width:auto;min-height:auto"> Nachtarbeit</label>
+        <label><input id="holiday" type="checkbox" style="width:auto;min-height:auto"> Feiertag</label>
+      </div>
+      <div class="field">
+        <label><input id="special" type="checkbox" style="width:auto;min-height:auto"> Sonderbemerkung</label>
+        <p class="note">Samstag und Sonntag werden automatisch erkannt.</p>
+      </div>
+    </div>
+    <div class="buttons">
+      <button class="primary" id="startBtn">▶ Start</button>
+      <button class="secondary" id="stopBtn">■ Stopp</button>
+    </div>
+    <p id="status" class="note" aria-live="polite">Noch keine laufende Zeiterfassung.</p>
+    <div class="buttons">
+      <button class="primary" id="saveBtn">Eintrag speichern</button>
+      <button class="secondary" id="clearBtn">Felder leeren</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Monatsübersicht</h2>
+    <div class="field">
+      <label for="month">Monat und Jahr</label>
+      <input id="month" type="month">
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <span>Arbeitszeit Ist</span>
+        <strong id="total">0:00 h</strong>
+      </div>
+      <div class="stat">
+        <span>Überstunden / Fehlzeit*</span>
+        <strong id="balance">0:00 h</strong>
+      </div>
+    </div>
+    <p class="note">*Vorläufige Differenz zum hinterlegten täglichen Soll. Bitte deine tatsächliche Arbeitszeitregelung prüfen.</p>
+    <div id="days"></div>
+  </section>
+
+  <section class="card">
+    <h2>Deine Daten</h2>
+    <p class="note">Die Einträge werden lokal in diesem Browser gespeichert. Lösche die Browserdaten nicht, bevor du deine Arbeitszeiten gesichert hast. Diese erste Version erstellt noch keine PDF-Datei.</p>
+    <button class="danger" id="exportBtn">Daten als JSON sichern</button>
+    <p class="note">Die Sicherungsdatei enthält deine Arbeitszeitdaten. Bewahre sie sicher auf.</p>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const STORAGE_KEY = "meineArbeitszeitV1";
+let records = {};
+let timerStartedAt = null;
+
+try {
+  records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+} catch (_) {
+  records = {};
+}
+
+const today = new Date();
+const localDate = d => [
+  d.getFullYear(),
+  String(d.getMonth()+1).padStart(2,"0"),
+  String(d.getDate()).padStart(2,"0")
+].join("-");
+
+$("workDate").value = localDate(today);
+$("month").value = localDate(today).slice(0,7);
+
+function saveAll() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+}
+
+function minutesBetween(start, end) {
+  if (!start || !end) return 0;
+  const [sh, sm] = start.split(":").map(Number);
+  const [eh, em] = end.split(":").map(Number);
+  let result = eh * 60 + em - (sh * 60 + sm);
+  if (result < 0) result += 1440;
+  return result;
+}
+
+function workedMinutes(r) {
+  return Math.max(0, minutesBetween(r.start, r.end) -
+    Math.max(0, Number(r.pause) || 0));
+}
+
+function formatMinutes(min) {
+  const sign = min < 0 ? "-" : "";
+  min = Math.abs(Math.round(min));
+  return sign + Math.floor(min/60) + ":" +
+    String(min%60).padStart(2,"0") + " h";
+}
+
+function getFormRecord() {
+  return {
+    start: $("start").value,
+    end: $("end").value,
+    pause: Number($("pause").value) || 0,
+    target: Number($("target").value) || 0,
+    remarks: $("remarks").value,
+    night: $("night").checked,
+    holiday: $("holiday").checked,
+    special: $("special").checked
+  };
+}
+
+function fillForm(date) {
+  const r = records[date];
+  $("workDate").value = date;
+  $("start").value = r?.start || "";
+  $("end").value = r?.end || "";
+  $("pause").value = r?.pause ?? 30;
+  $("target").value = r?.target ?? 8;
+  $("remarks").value = r?.remarks || "";
+  $("night").checked = !!r?.night;
+  $("holiday").checked = !!r?.holiday;
+  $("special").checked = !!r?.special;
+  $("status").textContent = r ? "Gespeicherter Eintrag geladen." :
+    "Für diesen Tag gibt es noch keinen Eintrag.";
+}
+
+$("workDate").addEventListener("change", () => fillForm($("workDate").value));
+
+$("startBtn").addEventListener("click", () => {
+  const date = $("workDate").value;
+  if (!date) return alert("Bitte zuerst einen Arbeitstag wählen.");
+  if (timerStartedAt) return alert("Die Zeiterfassung läuft bereits.");
+  const now = new Date();
+  const time = String(now.getHours()).padStart(2,"0") + ":" +
+    String(now.getMinutes()).padStart(2,"0");
+  $("start").value = time;
+  $("end").value = "";
+  timerStartedAt = now;
+  $("status").textContent = "Arbeitszeit läuft seit " + time + ".";
+});
+
+$("stopBtn").addEventListener("click", () => {
+  if (!timerStartedAt) {
+    return alert("Bitte zuerst auf Start tippen.");
+  }
+  const now = new Date();
+  const time = String(now.getHours()).padStart(2,"0") + ":" +
+    String(now.getMinutes()).padStart(2,"0");
+  $("end").value = time;
+  timerStartedAt = null;
+  $("status").textContent = "Erfassung beendet. Bitte Eintrag speichern.";
+});
+
+$("saveBtn").addEventListener("click", () => {
+  const date = $("workDate").value;
+  if (!date) return alert("Bitte einen Arbeitstag wählen.");
+  const r = getFormRecord();
+  if (r.end && !r.start) return alert("Bitte auch den Beginn eintragen.");
+  records[date] = r;
+  saveAll();
+  $("month").value = date.slice(0,7);
+  renderMonth();
+  $("status").textContent = "Eintrag für " + date + " gespeichert.";
+});
+
+$("clearBtn").addEventListener("click", () => {
+  $("start").value = "";
+  $("end").value = "";
+  $("pause").value = 30;
+  $("remarks").value = "";
+  $("night").checked = false;
+  $("holiday").checked = false;
+  $("special").checked = false;
+  $("status").textContent = "Felder geleert. Gespeicherte Daten bleiben erhalten.";
+});
+
+$("month").addEventListener("change", renderMonth);
+
+function renderMonth() {
+  const month = $("month").value;
+  if (!month) return;
+  const [year, mon] = month.split("-").map(Number);
+  const count = new Date(year, mon, 0).getDate();
+  let total = 0, target = 0, html = "";
+
+  for (let day=1; day<=count; day++) {
+    const date = year + "-" + String(mon).padStart(2,"0") + "-" +
+      String(day).padStart(2,"0");
+    const r = records[date];
+    const weekday = new Date(year, mon-1, day).getDay();
+    const weekend = weekday === 0 || weekday === 6;
+    const mins = r ? workedMinutes(r) : 0;
+    total += mins;
+    if (r) target += (Number(r.target)||0)*60;
+
+    const name = new Date(year,mon-1,day).toLocaleDateString("de-DE",
+      {weekday:"short"});
+    const detail = r
+      ? `${r.start || "–"}–${r.end || "–"} · Pause ${r.pause || 0} Min`
+      : "Noch nicht erfasst";
+    html += `<div class="day ${weekend ? "weekend" : ""}">
+      <div><strong>${String(day).padStart(2,"0")}. ${name}</strong>
+      <small>${detail}${r?.remarks ? " · " + escapeHTML(r.remarks) : ""}</small></div>
+      <div style="text-align:right"><strong>${r ? formatMinutes(mins) : "–"}</strong>
+      <br><button class="secondary" data-date="${date}">Öffnen</button></div>
+    </div>`;
+  }
+  $("days").innerHTML = html;
+  $("total").textContent = formatMinutes(total);
+  $("balance").textContent = formatMinutes(total-target);
+  $("days").querySelectorAll("button[data-date]").forEach(btn => {
+    btn.addEventListener("click", () => fillForm(btn.dataset.date));
+  });
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, ch => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[ch]);
+}
+
+$("exportBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(records, null, 2)],
+    {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "arbeitszeiten-sicherung.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+fillForm($("workDate").value);
+renderMonth();
+</script>
+</body>
+</html>
