@@ -14,10 +14,12 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - uses: subosito/android-action@v2
+      - uses: android-actions/setup-android@v3
         with:
-          target-sdk-level: 35
-          build-tools-version: "35.0.0"
+          cmdline-tools-version: '12.0'
+
+      - name: Install Android SDK
+        run: yes | sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - uses: gradle/actions/setup-gradle@v4
         with:
