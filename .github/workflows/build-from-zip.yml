@@ -25,7 +25,7 @@ jobs:
         run: yes | sdkmanager "platforms;android-35" "build-tools;35.0.0"
         
       - name: Install Android SDK
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" yes | sdkmanger --licences
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - uses: gradle/actions/setup-gradle@v4
         with:
