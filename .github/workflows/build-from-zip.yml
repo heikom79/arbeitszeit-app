@@ -1,4 +1,4 @@
-Name: Build Android APK from project ZIP
+name: Build Android APK from project ZIP
 
 on:
   workflow_dispatch:
@@ -14,7 +14,6 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # Nutze die neuere Android Action:
       - uses: subosito/android-action@v2
         with:
           target-sdk-level: 35
