@@ -1,4 +1,4 @@
-
+2
 name: Build Android APK from project ZIP
 
 on:
@@ -16,7 +16,14 @@ jobs:
           java-version: '17'
 
       - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v3
 
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses
+
+      - name: Install Android SDK
+        run: yes | sdkmanager "platforms;android-35" "build-tools;35.0.0"
+        
       - name: Install Android SDK
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0" yes | sdkmanger --licences
 
